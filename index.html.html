@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Minimalist Store</title>
+    <style>
+        /* --- SAME MINIMALIST STYLING AS BEFORE --- */
+        :root { --bg-color: #f9f9f9; --card-bg: #ffffff; --text-main: #333; --text-light: #777; }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: var(--bg-color); margin: 0; padding: 0; color: var(--text-main); }
+        header { padding: 20px; font-weight: 700; font-size: 1.2rem; background: var(--card-bg); border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Loading State */
+        .loading { padding: 20px; text-align: center; color: #888; }
+
+        /* Horizontal Scroll */
+        .container { padding: 20px; }
+        .product-scroller { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 15px; padding-bottom: 20px; -webkit-overflow-scrolling: touch; }
+        .product-scroller::-webkit-scrollbar { height: 6px; }
+        .product-scroller::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+        .product-card { background: var(--card-bg); border-radius: 12px; min-width: 260px; max-width: 260px; scroll-snap-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #eee; position: relative; }
+        
+        .product-image { width: 100%; height: 200px; object-fit: cover; background-color: #eee; }
+        .product-info { padding: 15px; }
+        .product-name { font-size: 1rem; margin: 0 0 5px 0; font-weight: 600; }
+        .stock-indicator { font-size: 0.85rem; color: var(--text-light); display: flex; align-items: center; justify-content: space-between; }
+        .stock-qty { font-weight: bold; color: var(--text-main); }
+
+        /* Admin Panel */
+        .admin-panel { margin-top: 40px; padding: 20px; background: #fff; border-top: 1px solid #ddd; }
+        .admin-title { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; color: var(--text-light); }
+        .admin-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .update-wrapper { display: flex; gap: 10px; }
+        .update-btn { background: black; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px; }
+        .update-btn:disabled { background: #ccc; }
+        input[type="number"] { width: 50px; padding: 5px; border: 1px solid #ddd; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <span>Live Inventory Store</span>
+        <span style="font-size:0.8rem; color:green;">● Live Connected</span>
+    </header>
+
+    <div class="container">
+        <h3>New Arrivals</h3>
+        <div id="loading-msg" class="loading">Loading products from database...</div>
+        <div class="product-scroller" id="product-container">
+            </div>
+    </div>
+
+    <div class="admin-panel">
+        <div class="admin-title">Database Control</div>
+        <div id="admin-list">
+            </div>
+    </div>
+
+    <script type="module">
+        // 1. Import Firebase Functions from the Web (CDN)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // 2. YOUR FIREBASE CONFIGURATION
+        // REPLACE THE OBJECT BELOW WITH YOUR OWN FROM FIREBASE CONSOLE
+        const firebaseConfig = {
+  apiKey: "AIzaSyDmJ6PIj2YinbSodP4Sk39BtOXSx8VG-Ks",
+  authDomain: "my-inventory-store.firebaseapp.com",
+  projectId: "my-inventory-store",
+  storageBucket: "my-inventory-store.firebasestorage.app",
+  messagingSenderId: "690261326708",
+  appId: "1:690261326708:web:26ba2c1d4a494615f38a21"
+};
+
+        // 3. Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // DOM Elements
+        const productContainer = document.getElementById('product-container');
+        const adminList = document.getElementById('admin-list');
+        const loadingMsg = document.getElementById('loading-msg');
+
+        // 4. REAL-TIME LISTENER (Reads data instantly when it changes)
+        const productsRef = collection(db, "products");
+
+        // This function runs AUTOMATICALLY whenever the database changes
+        onSnapshot(productsRef, (snapshot) => {
+            loadingMsg.style.display = 'none';
+            productContainer.innerHTML = '';
+            adminList.innerHTML = '';
+
+            const products = [];
+            
+            // Extract data
+            snapshot.docs.forEach(doc => {
+                products.push({ ...doc.data(), id: doc.id });
+            });
+
+            // Sort products alphabetically (optional)
+            products.sort((a, b) => a.name.localeCompare(b.name));
+
+            // Render Views
+            products.forEach(product => {
+                renderCustomerView(product);
+                renderAdminView(product);
+            });
+        });
+
+        // 5. Render Functions
+        function renderCustomerView(product) {
+            const stockStatus = product.qty > 0 ? `${product.qty} left` : `<span style="color:red">Out of Stock</span>`;
+            
+            const card = `
+            <div class="product-card">
+                <img src="${product.img}" class="product-image" alt="${product.name}">
+                <div class="product-info">
+                    <h4 class="product-name">${product.name}</h4>
+                    <div class="stock-indicator">
+                        <span>Quantity:</span>
+                        <span class="stock-qty">${stockStatus}</span>
+                    </div>
+                </div>
+            </div>`;
+            productContainer.innerHTML += card;
+        }
+
+        function renderAdminView(product) {
+            // We create DOM elements carefully here to attach event listeners
+            const row = document.createElement('div');
+            row.className = 'admin-row';
+            
+            row.innerHTML = `
+                <span>${product.name}</span>
+                <div class="update-wrapper">
+                    <input type="number" id="input-${product.id}" value="${product.qty}" min="0">
+                    <button class="update-btn" id="btn-${product.id}">Save</button>
+                </div>
+            `;
+            
+            adminList.appendChild(row);
+
+            // Attach Click Event for Update
+            document.getElementById(`btn-${product.id}`).addEventListener('click', () => {
+                const newVal = document.getElementById(`input-${product.id}`).value;
+                updateStockInDB(product.id, newVal);
+            });
+        }
+
+        // 6. UPDATE FUNCTION (Writes to Database)
+        async function updateStockInDB(docId, newQty) {
+            const btn = document.getElementById(`btn-${docId}`);
+            const originalText = btn.innerText;
+            btn.innerText = "...";
+            btn.disabled = true;
+
+            const productRef = doc(db, "products", docId);
+            
+            try {
+                await updateDoc(productRef, {
+                    qty: Number(newQty)
+                });
+                // Note: We don't need to manually re-render! 
+                // onSnapshot above will see the change and update the UI automatically.
+                btn.innerText = "Done";
+                setTimeout(() => { 
+                    btn.innerText = originalText; 
+                    btn.disabled = false;
+                }, 1000);
+            } catch (error) {
+                console.error("Error updating document: ", error);
+                alert("Error updating stock");
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
