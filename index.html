@@ -3,177 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real Minimalist Store</title>
+    <title>Honda Display - Clean</title>
     <style>
-        /* --- SAME MINIMALIST STYLING AS BEFORE --- */
-        :root { --bg-color: #f9f9f9; --card-bg: #ffffff; --text-main: #333; --text-light: #777; }
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: var(--bg-color); margin: 0; padding: 0; color: var(--text-main); }
-        header { padding: 20px; font-weight: 700; font-size: 1.2rem; background: var(--card-bg); border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        /* --- STYLING --- */
+        :root { --bg-color: #f4f6f8; --card-bg: #ffffff; --text-main: #222; }
+        body { font-family: sans-serif; background-color: var(--bg-color); margin: 0; padding: 0; padding-bottom: 80px; color: var(--text-main); }
         
-        /* Loading State */
-        .loading { padding: 20px; text-align: center; color: #888; }
-
-        /* Horizontal Scroll */
+        header { padding: 20px; font-weight: 800; font-size: 1.2rem; background: #fff; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+        
         .container { padding: 20px; }
-        .product-scroller { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 15px; padding-bottom: 20px; -webkit-overflow-scrolling: touch; }
-        .product-scroller::-webkit-scrollbar { height: 6px; }
-        .product-scroller::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
-        .product-card { background: var(--card-bg); border-radius: 12px; min-width: 260px; max-width: 260px; scroll-snap-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #eee; position: relative; }
-        
-        .product-image { width: 100%; height: 200px; object-fit: cover; background-color: #eee; }
-        .product-info { padding: 15px; }
-        .product-name { font-size: 1rem; margin: 0 0 5px 0; font-weight: 600; }
-        .stock-indicator { font-size: 0.85rem; color: var(--text-light); display: flex; align-items: center; justify-content: space-between; }
-        .stock-qty { font-weight: bold; color: var(--text-main); }
+        .section-header { font-size: 1.1rem; font-weight: 800; text-transform: uppercase; margin: 30px 0 15px 0; border-left: 4px solid #d32f2f; padding-left: 10px; }
 
-        /* Admin Panel */
-        .admin-panel { margin-top: 40px; padding: 20px; background: #fff; border-top: 1px solid #ddd; }
-        .admin-title { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; color: var(--text-light); }
-        .admin-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
-        .update-wrapper { display: flex; gap: 10px; }
-        .update-btn { background: black; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px; }
-        .update-btn:disabled { background: #ccc; }
-        input[type="number"] { width: 50px; padding: 5px; border: 1px solid #ddd; border-radius: 4px; }
+        /* Scroller */
+        .product-scroller { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 20px; padding-bottom: 20px; -webkit-overflow-scrolling: touch; }
+        
+        /* CLEANER CARD DESIGN */
+        .vehicle-card { 
+            background: #fff; border-radius: 12px; 
+            min-width: 250px; max-width: 250px; /* Slightly narrower */
+            scroll-snap-align: center; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+            border: 1px solid #eee; overflow: hidden;
+            display: flex; flex-direction: column;
+            text-align: center; /* Center alignment looks better without price */
+        }
+        
+        .vehicle-image { width: 100%; height: 160px; object-fit: cover; background-color: #eee; }
+        
+        .vehicle-info { padding: 15px; display: flex; flex-direction: column; gap: 4px; flex-grow: 1; justify-content: center; }
+        
+        .model-name { font-size: 1.2rem; font-weight: 800; margin: 0; color: #000; }
+        .color-name { font-size: 0.95rem; color: #666; font-weight: 500; }
+
+        /* Stock Status */
+        .status-bar { padding: 10px; font-weight: bold; font-size: 0.85rem; margin-top: auto; }
+        .available { background: #e8f5e9; color: #2e7d32; }
+        .sold-out { background: #ffebee; color: #c62828; }
+
+        /* --- HIDDEN ADMIN PANEL --- */
+        #admin-section { display: none; margin-top: 40px; background: #fff; border-top: 2px solid #333; padding: 20px; }
+        .admin-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; align-items: center; }
+        .login-btn { position: fixed; bottom: 20px; right: 20px; background: #333; color: white; padding: 10px 15px; border-radius: 30px; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 200; }
+        
+        input[type="number"] { width: 50px; padding: 5px; text-align: center; }
+        .save-btn { background: black; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <header>
-        <span>Live Inventory Store</span>
-        <span style="font-size:0.8rem; color:green;">● Live Connected</span>
+        <span>HONDA INVENTORY</span>
+        <span style="font-size:0.8rem; color:green;">● Live</span>
     </header>
 
     <div class="container">
-        <h3>New Arrivals</h3>
-        <div id="loading-msg" class="loading">Loading products from database...</div>
-        <div class="product-scroller" id="product-container">
-            </div>
+        
+        <div class="section-header">Scooters</div>
+        <div class="product-scroller" id="scooter-list"></div>
+
+        <div class="section-header">Motorcycles</div>
+        <div class="product-scroller" id="bike-list"></div>
+
     </div>
 
-    <div class="admin-panel">
-        <div class="admin-title">Database Control</div>
-        <div id="admin-list">
-            </div>
+    <div id="admin-section">
+        <h3 style="margin-top:0;">Stock Control</h3>
+        <div id="admin-list"></div>
+        <button onclick="logout()" style="margin-top:20px; background:red; color:white; border:none; padding:10px; border-radius:4px;">Close Admin</button>
     </div>
+
+    <button class="login-btn" onclick="adminLogin()">Staff Login 🔒</button>
 
     <script type="module">
-        // 1. Import Firebase Functions from the Web (CDN)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // 2. YOUR FIREBASE CONFIGURATION
-        // REPLACE THE OBJECT BELOW WITH YOUR OWN FROM FIREBASE CONSOLE
+        // YOUR CONFIG
         const firebaseConfig = {
-  apiKey: "AIzaSyDmJ6PIj2YinbSodP4Sk39BtOXSx8VG-Ks",
-  authDomain: "my-inventory-store.firebaseapp.com",
-  projectId: "my-inventory-store",
-  storageBucket: "my-inventory-store.firebasestorage.app",
-  messagingSenderId: "690261326708",
-  appId: "1:690261326708:web:26ba2c1d4a494615f38a21"
-};
+            apiKey: "AIzaSyDmJ6PIj2YinbSodP4Sk39BtOXSx8VG-Ks",
+            authDomain: "my-inventory-store.firebaseapp.com",
+            projectId: "my-inventory-store",
+            storageBucket: "my-inventory-store.firebasestorage.app",
+            messagingSenderId: "690261326708",
+            appId: "1:690261326708:web:26ba2c1d4a494615f38a21"
+        };
 
-        // 3. Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
         // DOM Elements
-        const productContainer = document.getElementById('product-container');
+        const scooterList = document.getElementById('scooter-list');
+        const bikeList = document.getElementById('bike-list');
         const adminList = document.getElementById('admin-list');
-        const loadingMsg = document.getElementById('loading-msg');
 
-        // 4. REAL-TIME LISTENER (Reads data instantly when it changes)
-        const productsRef = collection(db, "products");
-
-        // This function runs AUTOMATICALLY whenever the database changes
-        onSnapshot(productsRef, (snapshot) => {
-            loadingMsg.style.display = 'none';
-            productContainer.innerHTML = '';
+        // Load Data
+        onSnapshot(collection(db, "products"), (snapshot) => {
+            scooterList.innerHTML = '';
+            bikeList.innerHTML = '';
             adminList.innerHTML = '';
 
-            const products = [];
+            const items = [];
+            snapshot.docs.forEach(doc => items.push({ ...doc.data(), id: doc.id }));
             
-            // Extract data
-            snapshot.docs.forEach(doc => {
-                products.push({ ...doc.data(), id: doc.id });
+            // Sort A-Z by Model
+            items.sort((a, b) => (a.model || "").localeCompare(b.model || ""));
+
+            items.forEach(item => {
+                const card = createCard(item);
+                const category = (item.category || "").toLowerCase();
+
+                // Sort into Categories
+                if(category.includes('scooter') || category.includes('scooty')) {
+                    scooterList.innerHTML += card;
+                } else {
+                    bikeList.innerHTML += card;
+                }
+
+                // Create Admin Row
+                createAdminRow(item);
             });
 
-            // Sort products alphabetically (optional)
-            products.sort((a, b) => a.name.localeCompare(b.name));
-
-            // Render Views
-            products.forEach(product => {
-                renderCustomerView(product);
-                renderAdminView(product);
-            });
+            // Empty State Messages
+            if(scooterList.innerHTML === '') scooterList.innerHTML = '<div style="padding:10px; color:#999">No Scooters</div>';
+            if(bikeList.innerHTML === '') bikeList.innerHTML = '<div style="padding:10px; color:#999">No Bikes</div>';
         });
 
-        // 5. Render Functions
-        function renderCustomerView(product) {
-            const stockStatus = product.qty > 0 ? `${product.qty} left` : `<span style="color:red">Out of Stock</span>`;
-            
-            const card = `
-            <div class="product-card">
-                <img src="${product.img}" class="product-image" alt="${product.name}">
-                <div class="product-info">
-                    <h4 class="product-name">${product.name}</h4>
-                    <div class="stock-indicator">
-                        <span>Quantity:</span>
-                        <span class="stock-qty">${stockStatus}</span>
-                    </div>
+        // 1. Create SIMPLIFIED Card (No Price, No Variant)
+        function createCard(v) {
+            const img = v.img || "https://placehold.co/400x300?text=No+Image";
+            const isStock = v.qty > 0;
+            const statusClass = isStock ? "available" : "sold-out";
+            const statusText = isStock ? `Available (${v.qty})` : "Sold Out";
+            const color = v.color || "Standard Color";
+
+            return `
+            <div class="vehicle-card">
+                <img src="${img}" class="vehicle-image">
+                <div class="vehicle-info">
+                    <div class="model-name">${v.model || "Unknown"}</div>
+                    <div class="color-name">${color}</div>
                 </div>
+                <div class="status-bar ${statusClass}">${statusText}</div>
             </div>`;
-            productContainer.innerHTML += card;
         }
 
-        function renderAdminView(product) {
-            // We create DOM elements carefully here to attach event listeners
-            const row = document.createElement('div');
-            row.className = 'admin-row';
-            
-            row.innerHTML = `
-                <span>${product.name}</span>
-                <div class="update-wrapper">
-                    <input type="number" id="input-${product.id}" value="${product.qty}" min="0">
-                    <button class="update-btn" id="btn-${product.id}">Save</button>
+        // 2. Create Admin Row
+        function createAdminRow(v) {
+            const div = document.createElement('div');
+            div.className = 'admin-row';
+            div.innerHTML = `
+                <div>
+                    <strong>${v.model}</strong> <br>
+                    <span style="font-size:0.8rem; color:#666">${v.color}</span>
+                </div>
+                <div>
+                    <input type="number" id="inp-${v.id}" value="${v.qty}" min="0">
+                    <button class="save-btn" id="btn-${v.id}">Save</button>
                 </div>
             `;
-            
-            adminList.appendChild(row);
+            adminList.appendChild(div);
 
-            // Attach Click Event for Update
-            document.getElementById(`btn-${product.id}`).addEventListener('click', () => {
-                const newVal = document.getElementById(`input-${product.id}`).value;
-                updateStockInDB(product.id, newVal);
+            document.getElementById(`btn-${v.id}`).addEventListener('click', async () => {
+                const btn = document.getElementById(`btn-${v.id}`);
+                const val = document.getElementById(`inp-${v.id}`).value;
+                btn.innerText = "...";
+                try {
+                    await updateDoc(doc(db, "products", v.id), { qty: Number(val) });
+                    btn.innerText = "OK";
+                    setTimeout(() => btn.innerText = "Save", 1000);
+                } catch(e) { alert("Error"); }
             });
         }
+    </script>
 
-        // 6. UPDATE FUNCTION (Writes to Database)
-        async function updateStockInDB(docId, newQty) {
-            const btn = document.getElementById(`btn-${docId}`);
-            const originalText = btn.innerText;
-            btn.innerText = "...";
-            btn.disabled = true;
-
-            const productRef = doc(db, "products", docId);
-            
-            try {
-                await updateDoc(productRef, {
-                    qty: Number(newQty)
-                });
-                // Note: We don't need to manually re-render! 
-                // onSnapshot above will see the change and update the UI automatically.
-                btn.innerText = "Done";
-                setTimeout(() => { 
-                    btn.innerText = originalText; 
-                    btn.disabled = false;
-                }, 1000);
-            } catch (error) {
-                console.error("Error updating document: ", error);
-                alert("Error updating stock");
-                btn.innerText = originalText;
-                btn.disabled = false;
+    <script>
+        function adminLogin() {
+            const password = prompt("Staff Password:");
+            if (password === "honda123") {
+                document.getElementById('admin-section').style.display = 'block';
+                window.scrollTo(0, document.body.scrollHeight);
+            } else if(password) {
+                alert("Wrong Password!");
             }
         }
+        function logout() { document.getElementById('admin-section').style.display = 'none'; }
     </script>
 </body>
 </html>
