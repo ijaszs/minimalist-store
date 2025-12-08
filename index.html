@@ -1,192 +1,566 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Honda Display - Clean</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="https://hw-2ehpefpo3-hw-51b57a82.vercel.app/favicon.ico">
+    <title>KACHERY HONDA</title>
     <style>
-        /* --- STYLING --- */
-        :root { --bg-color: #f4f6f8; --card-bg: #ffffff; --text-main: #222; }
-        body { font-family: sans-serif; background-color: var(--bg-color); margin: 0; padding: 0; padding-bottom: 80px; color: var(--text-main); }
-        
-        header { padding: 20px; font-weight: 800; font-size: 1.2rem; background: #fff; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-        
-        .container { padding: 20px; }
-        .section-header { font-size: 1.1rem; font-weight: 800; text-transform: uppercase; margin: 30px 0 15px 0; border-left: 4px solid #d32f2f; padding-left: 10px; }
+      /* --- 1. CSS VARIABLES & RESET --- */
+      :root {
+        --bg-color: #f0f2f5;
+        --card-bg: #ffffff;
+        --honda-red: #cc0000;
+        --text-dark: #1a1a1a;
+      }
 
-        /* Scroller */
-        .product-scroller { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 20px; padding-bottom: 20px; -webkit-overflow-scrolling: touch; }
-        
-        /* CLEANER CARD DESIGN */
-        .vehicle-card { 
-            background: #fff; border-radius: 12px; 
-            min-width: 250px; max-width: 250px; /* Slightly narrower */
-            scroll-snap-align: center; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
-            border: 1px solid #eee; overflow: hidden;
-            display: flex; flex-direction: column;
-            text-align: center; /* Center alignment looks better without price */
-        }
-        
-        .vehicle-image { width: 100%; height: 160px; object-fit: cover; background-color: #eee; }
-        
-        .vehicle-info { padding: 15px; display: flex; flex-direction: column; gap: 4px; flex-grow: 1; justify-content: center; }
-        
-        .model-name { font-size: 1.2rem; font-weight: 800; margin: 0; color: #000; }
-        .color-name { font-size: 0.95rem; color: #666; font-weight: 500; }
+      * { box-sizing: border-box; }
 
-        /* Stock Status */
-        .status-bar { padding: 10px; font-weight: bold; font-size: 0.85rem; margin-top: auto; }
-        .available { background: #e8f5e9; color: #2e7d32; }
-        .sold-out { background: #ffebee; color: #c62828; }
+      body {
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        background-color: var(--bg-color);
+        margin: 0;
+        padding: 0;
+        padding-bottom: 100px;
+        color: var(--text-dark);
+      }
 
-        /* --- HIDDEN ADMIN PANEL --- */
-        #admin-section { display: none; margin-top: 40px; background: #fff; border-top: 2px solid #333; padding: 20px; }
-        .admin-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; align-items: center; }
-        .login-btn { position: fixed; bottom: 20px; right: 20px; background: #333; color: white; padding: 10px 15px; border-radius: 30px; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 200; }
-        
-        input[type="number"] { width: 50px; padding: 5px; text-align: center; }
-        .save-btn { background: black; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+      /* --- 2. HEADER --- */
+      header {
+        background: #fff;
+        padding: 15px 20px;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 3px solid var(--honda-red);
+      }
+
+      .live-indicator {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #2e7d32;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: #e8f5e9;
+        padding: 5px 12px;
+        border-radius: 20px;
+      }
+      
+      .blink {
+        width: 8px;
+        height: 8px;
+        background: #2e7d32;
+        border-radius: 50%;
+        animation: blinker 2s linear infinite;
+      }
+      @keyframes blinker { 50% { opacity: 0; } }
+
+      /* --- 3. MAIN LAYOUT --- */
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .section-title {
+        font-size: 1.4rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        margin: 30px 0 15px 0;
+        padding-left: 12px;
+        border-left: 5px solid var(--honda-red);
+      }
+
+      /* --- 4. SCROLLER --- */
+      .scroller-wrapper {
+        display: flex;
+        overflow-x: auto;
+        padding-bottom: 25px;
+        gap: 20px;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none; 
+      }
+      .scroller-wrapper::-webkit-scrollbar { display: none; }
+
+      /* --- 5. PRODUCT CARD DESIGN --- */
+      .product-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        min-width: 290px; /* Slightly wider to fit colors */
+        max-width: 290px;
+        scroll-snap-align: start;
+        border: 1px solid #e0e0e0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .card-image-box {
+        width: 100%;
+        height: 170px;
+        background: #f9f9f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid #f0f0f0;
+      }
+      .card-image-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .card-model-name {
+        font-size: 1.2rem;
+        font-weight: 800;
+        text-align: center;
+        padding: 12px;
+        margin: 0;
+        background: #fff;
+        color: #000;
+      }
+
+      /* --- COLOR GRID LAYOUT --- */
+      .stock-grid {
+        padding: 15px;
+        background: #fff;
+        display: flex;
+        flex-wrap: wrap; /* Allows colors to wrap to next line */
+        gap: 12px;       /* Space between bubbles */
+        justify-content: center; 
+        border-top: 1px dashed #eee;
+        flex-grow: 1;
+      }
+
+      .color-swatch-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        width: 45px;
+      }
+
+      .color-swatch {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        position: relative;
+      }
+
+      .swatch-out-of-stock {
+        opacity: 0.3;
+        filter: grayscale(100%);
+        border: 2px dashed #ccc;
+        box-shadow: none;
+      }
+
+      .swatch-qty {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #333;
+      }
+
+      .swatch-white-border {
+        border: 1px solid #ddd;
+      }
+
+
+      /* --- 6. ADMIN PANEL --- */
+      #admin-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 2000;
+        justify-content: center;
+        align-items: flex-end; 
+      }
+      
+      .admin-panel {
+        background: #fff;
+        width: 100%;
+        max-width: 600px;
+        height: 85vh;
+        border-radius: 15px 15px 0 0;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        animation: slideUp 0.3s ease;
+      }
+      @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+      .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+      }
+
+      .admin-content { overflow-y: auto; flex-grow: 1; }
+
+      .admin-card-row {
+        background: #f8f9fa;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 10px;
+        margin-bottom: 15px;
+      }
+
+      .admin-color-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+      }
+      .admin-color-row:last-child { border-bottom: none; }
+
+      .admin-input {
+        width: 60px;
+        padding: 8px;
+        text-align: center;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-weight: bold;
+        margin-right: 8px;
+      }
+
+      .btn { border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+      .btn-save { background: #000; color: #fff; width: 100%; margin-top:10px;}
+      .btn-close { background: #f0f0f0; color: #333; }
+      
+      .login-trigger {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #111;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        border: none;
+        font-weight: bold;
+        cursor: pointer;
+        z-index: 1500;
+      }
+
+     /* Footer Base */
+    .simple-footer {
+      background-color: #f1f1f1; 
+      padding: 20px;            
+      text-align: center;        
+      width: 100%;               
+      margin-top: 50px;          
+    }
+
+    .simple-footer a {
+      color: #333;
+      text-decoration: none;
+      font-weight: bold;
+    }
     </style>
-</head>
-<body>
+  </head>
+  <body>
 
     <header>
-        <span>HONDA INVENTORY</span>
-        <span style="font-size:0.8rem; color:green;">● Live</span>
+      <div class="logo">
+         <svg height="22" viewBox="0 0 262 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g clip-path="url(#clip0_5439_24857)">
+              <path d="M80.8811 12.4482V10.8842L82.4571 10.7045C83.0049 10.6391 83.2395 10.1395 83.304 10.0239L87.2453 3.61596C87.5664 3.11322 87.2545 2.6667 86.8402 2.62016L84.7661 2.38101V0.794922H93.7403C94.2407 0.794922 94.5619 1.14283 94.772 1.44005L100.012 9.44972C100.425 10.0944 100.742 10.5953 101.267 10.6644L102.917 10.8478V12.4482H92.8306V10.8699L94.1117 10.7123C94.7259 10.6427 95.2287 10.363 94.7259 9.61469L94.2412 8.88155H87.0844L86.5356 9.77228C86.1932 10.317 86.5356 10.6423 87.0605 10.7123L88.3429 10.8699V12.4482H80.8825M88.3659 6.82176H92.8924L90.6073 3.22842L88.3655 6.82176" fill="#CC0000"></path>
+              <path d="M74.1948 0.795383H62.6558V2.38147L64.1069 2.52662C64.6419 2.60634 64.8612 2.99756 64.8612 3.52564V9.79809C64.8612 10.2317 64.6792 10.6432 64.2014 10.7128L62.6508 10.9118V12.4413L74.1948 12.4482C79.5088 12.4482 81.7925 9.86583 81.7925 6.45404C81.7925 3.38924 79.5088 0.794922 74.1948 0.794922M72.4142 10.2114H69.4402V3.02429H72.4142C75.2505 3.02429 76.4449 3.6837 76.4449 6.61256C76.4449 9.54142 75.251 10.2119 72.4142 10.2119" fill="#CC0000"></path><path d="M0 12.4486H9.33679V10.8943L7.73826 10.7132C7.37331 10.6649 7.00651 10.4363 7.00651 9.65801V7.78208H14.1927V9.56538C14.1927 10.0953 14.1033 10.5962 13.4808 10.6649L11.856 10.8483V12.4491H21.1923V10.8483L19.5454 10.6649C19.2261 10.6192 18.8584 10.364 18.8584 9.70501V3.64084C18.8584 3.02383 19.0832 2.60588 19.5671 2.56441L21.1923 2.38101V0.794922H11.856V2.35935L13.4808 2.56441C14.031 2.63353 14.1927 3.0676 14.1927 3.64084V5.45041H7.00651V3.61642C7.00651 2.92844 7.28115 2.60588 7.75992 2.56441L9.33679 2.38101V0.794922H0.0211969V2.38101L1.58055 2.56441C2.19987 2.63353 2.35931 3.0911 2.33627 3.68323V9.59073C2.33627 10.2501 2.15379 10.6432 1.55844 10.7128L0 10.8939V12.4482" fill="#CC0000"></path>
+              <path d="M21.6512 6.56494C21.6512 2.90755 24.6031 0.341797 31.1922 0.341797C37.7812 0.341797 40.6949 2.90755 40.6949 6.56494C40.6949 10.2223 37.7402 12.859 31.1922 12.859C24.6442 12.859 21.6512 10.3182 21.6512 6.56494ZM31.1696 2.58729C28.5177 2.58729 27.0085 3.57341 27.0085 6.59121C27.0085 9.609 28.5177 10.6435 31.1696 10.6435C33.8215 10.6435 35.3362 9.65831 35.3362 6.59121C35.3362 3.5241 33.8238 2.58729 31.1696 2.58729Z" fill="#CC0000"></path>
+              <path d="M41.2114 12.4482H48.6718V10.8939L47.0687 10.7128C46.6134 10.6644 46.3355 10.2801 46.3355 9.75017V3.82194L52.5389 11.9924C52.7467 12.2634 53.1333 12.4482 53.5019 12.4482H59.3555V3.61596C59.3555 3.19939 59.4629 2.63491 60.0642 2.56394L61.6904 2.38054V0.794922H54.2309V2.35935L55.8599 2.56441C56.4308 2.63353 56.5677 3.11322 56.5677 3.65973V9.42991L50.409 1.30549C50.1818 1.00827 49.8851 0.794922 49.4501 0.794922H41.2109V2.38101L42.7671 2.56441C43.315 2.64597 43.5214 2.92383 43.5214 3.68323V9.59073C43.5214 10.2893 43.3306 10.6234 42.7431 10.7128L41.2109 10.8939V12.4482" fill="#CC0000"></path>
+            </g>
+            <defs>
+              <clipPath id="clip0_5439_24857"><rect width="261.073" height="24" fill="white"></rect></clipPath>
+            </defs>
+          </svg>
+      </div>
+      <div class="live-indicator">
+        <span class="blink"></span> Live
+      </div>
     </header>
 
     <div class="container">
-        
-        <div class="section-header">Scooters</div>
-        <div class="product-scroller" id="scooter-list"></div>
+      
+      <div class="section-title">Scooters</div>
+      <div class="scroller-wrapper" id="scooter-list">
+        <div style="padding:20px; color:#999;">Loading Inventory...</div>
+      </div>
 
-        <div class="section-header">Motorcycles</div>
-        <div class="product-scroller" id="bike-list"></div>
+      <div class="section-title">Motorcycles</div>
+      <div class="scroller-wrapper" id="bike-list">
+        <div style="padding:20px; color:#999;">Loading Inventory...</div>
+      </div>
 
     </div>
 
-    <div id="admin-section">
-        <h3 style="margin-top:0;">Stock Control</h3>
-        <div id="admin-list"></div>
-        <button onclick="logout()" style="margin-top:20px; background:red; color:white; border:none; padding:10px; border-radius:4px;">Close Admin</button>
+    <div id="admin-overlay">
+      <div class="admin-panel">
+        <div class="admin-header">
+          <h3 style="margin:0">Stock Control</h3>
+          <button class="btn btn-close" onclick="toggleAdmin(false)">Close</button>
+        </div>
+        <div class="admin-content" id="admin-list"></div>
+      </div>
     </div>
 
-    <button class="login-btn" onclick="adminLogin()">Staff Login 🔒</button>
+    <button class="login-trigger" onclick="adminLogin()">Staff 🔒</button>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+      import {
+        getFirestore,
+        collection,
+        onSnapshot,
+        doc,
+        updateDoc,
+        query,
+        orderBy
+      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // YOUR CONFIG
-        const firebaseConfig = {
-            apiKey: "AIzaSyDmJ6PIj2YinbSodP4Sk39BtOXSx8VG-Ks",
-            authDomain: "my-inventory-store.firebaseapp.com",
-            projectId: "my-inventory-store",
-            storageBucket: "my-inventory-store.firebasestorage.app",
-            messagingSenderId: "690261326708",
-            appId: "1:690261326708:web:26ba2c1d4a494615f38a21"
-        };
+      // 1. FIREBASE CONFIG
+      const firebaseConfig = {
+        apiKey: "AIzaSyDmJ6PIj2YinbSodP4Sk39BtOXSx8VG-Ks",
+        authDomain: "my-inventory-store.firebaseapp.com",
+        projectId: "my-inventory-store",
+        storageBucket: "my-inventory-store.firebasestorage.app",
+        messagingSenderId: "690261326708",
+        appId: "1:690261326708:web:26ba2c1d4a494615f38a21",
+      };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
 
-        // DOM Elements
-        const scooterList = document.getElementById('scooter-list');
-        const bikeList = document.getElementById('bike-list');
-        const adminList = document.getElementById('admin-list');
+      // 2. DOM ELEMENTS
+      const scooterList = document.getElementById("scooter-list");
+      const bikeList = document.getElementById("bike-list");
+      const adminList = document.getElementById("admin-list");
 
-        // Load Data
-        onSnapshot(collection(db, "products"), (snapshot) => {
-            scooterList.innerHTML = '';
-            bikeList.innerHTML = '';
-            adminList.innerHTML = '';
+      // 3. FETCH & RENDER
+      const q = query(collection(db, "products"), orderBy("model"));
 
-            const items = [];
-            snapshot.docs.forEach(doc => items.push({ ...doc.data(), id: doc.id }));
-            
-            // Sort A-Z by Model
-            items.sort((a, b) => (a.model || "").localeCompare(b.model || ""));
+      onSnapshot(q, (snapshot) => {
+        scooterList.innerHTML = "";
+        bikeList.innerHTML = "";
+        adminList.innerHTML = "";
 
-            items.forEach(item => {
-                const card = createCard(item);
-                const category = (item.category || "").toLowerCase();
+        snapshot.docs.forEach((doc) => {
+          const item = { ...doc.data(), id: doc.id };
 
-                // Sort into Categories
-                if(category.includes('scooter') || category.includes('scooty')) {
-                    scooterList.innerHTML += card;
-                } else {
-                    bikeList.innerHTML += card;
-                }
+          // CREATE DISPLAY CARD
+          const cardHTML = createCard(item);
+          const cat = (item.category || "").toLowerCase();
 
-                // Create Admin Row
-                createAdminRow(item);
-            });
+          if (cat.includes("scooter") || cat.includes("scooty")) {
+            scooterList.innerHTML += cardHTML;
+          } else {
+            bikeList.innerHTML += cardHTML;
+          }
 
-            // Empty State Messages
-            if(scooterList.innerHTML === '') scooterList.innerHTML = '<div style="padding:10px; color:#999">No Scooters</div>';
-            if(bikeList.innerHTML === '') bikeList.innerHTML = '<div style="padding:10px; color:#999">No Bikes</div>';
+          // CREATE ADMIN PANEL ROW
+          createAdminBlock(item);
         });
 
-        // 1. Create SIMPLIFIED Card (No Price, No Variant)
-        function createCard(v) {
-            const img = v.img || "https://placehold.co/400x300?text=No+Image";
-            const isStock = v.qty > 0;
-            const statusClass = isStock ? "available" : "sold-out";
-            const statusText = isStock ? `Available (${v.qty})` : "Sold Out";
-            const color = v.color || "Standard Color";
+        if (scooterList.innerHTML === "") scooterList.innerHTML = '<p style="padding:20px">No Stock</p>';
+        if (bikeList.innerHTML === "") bikeList.innerHTML = '<p style="padding:20px">No Stock</p>';
+      });
 
-            return `
-            <div class="vehicle-card">
-                <img src="${img}" class="vehicle-image">
-                <div class="vehicle-info">
-                    <div class="model-name">${v.model || "Unknown"}</div>
-                    <div class="color-name">${color}</div>
-                </div>
-                <div class="status-bar ${statusClass}">${statusText}</div>
-            </div>`;
-        }
 
-        // 2. Create Admin Row
-        function createAdminRow(v) {
-            const div = document.createElement('div');
-            div.className = 'admin-row';
-            div.innerHTML = `
-                <div>
-                    <strong>${v.model}</strong> <br>
-                    <span style="font-size:0.8rem; color:#666">${v.color}</span>
-                </div>
-                <div>
-                    <input type="number" id="inp-${v.id}" value="${v.qty}" min="0">
-                    <button class="save-btn" id="btn-${v.id}">Save</button>
-                </div>
-            `;
-            adminList.appendChild(div);
+      // --- HELPER FUNCTIONS ---
 
-            document.getElementById(`btn-${v.id}`).addEventListener('click', async () => {
-                const btn = document.getElementById(`btn-${v.id}`);
-                const val = document.getElementById(`inp-${v.id}`).value;
-                btn.innerText = "...";
-                try {
-                    await updateDoc(doc(db, "products", v.id), { qty: Number(val) });
-                    btn.innerText = "OK";
-                    setTimeout(() => btn.innerText = "Save", 1000);
-                } catch(e) { alert("Error"); }
-            });
-        }
+      // 1. Create Display Card with Multi-Color Grid
+      function createCard(item) {
+        const imgSrc = item.img || "https://placehold.co/400x300?text=Honda";
+        
+        let variantsHTML = "";
+        // Safely check if variants exists and is an array
+        const variants = Array.isArray(item.variants) ? item.variants : [];
+
+        variants.forEach(v => {
+          const hex = getSmartColor(v.color);
+          const isWhite = v.color.toLowerCase().includes("white") || v.color.toLowerCase().includes("silver");
+          const borderClass = isWhite ? "swatch-white-border" : "";
+          const stockClass = v.qty == 0 ? "swatch-out-of-stock" : "";
+          
+          variantsHTML += `
+            <div class="color-swatch-wrapper" title="${v.color}">
+              <div class="color-swatch ${borderClass} ${stockClass}" 
+                   style="background-color: ${hex};">
+              </div>
+              <span class="swatch-qty">${v.qty}</span>
+            </div>
+          `;
+        });
+
+        return `
+          <div class="product-card">
+            <div class="card-image-box">
+              <img src="${imgSrc}" alt="${item.model}" loading="lazy">
+            </div>
+            <h3 class="card-model-name">${item.model}</h3>
+            <div class="stock-grid">
+              ${variantsHTML}
+            </div>
+          </div>
+        `;
+      }
+
+      // 2. Create Admin Control Block (One Block per Model)
+     // 2. Create Admin Control Block (One Block per Model)
+      function createAdminBlock(item) {
+        const div = document.createElement("div");
+        div.className = "admin-card-row";
+        
+        const variants = Array.isArray(item.variants) ? item.variants : [];
+        
+        // HTML Structure
+        let html = `
+          <div class="admin-card-title">
+            <span>${item.model}</span>
+            <div class="batch-control">
+               Set All: <input type="number" class="batch-input" id="batch-${item.id}" placeholder="#">
+            </div>
+          </div>
+          <div id="inputs-container-${item.id}">
+        `;
+
+        // Loop through colors to create individual inputs
+        variants.forEach((v, index) => {
+           const colorHex = getSmartColor(v.color);
+           html += `
+             <div class="admin-color-row">
+                <div class="admin-color-label">
+                  <span class="mini-dot" style="background:${colorHex}"></span>
+                  ${v.color}
+                </div>
+                <input type="number" class="admin-input individual-input-${item.id}" id="inp-${item.id}-${index}" value="${v.qty}" min="0">
+             </div>
+           `;
+        });
+
+        html += `</div><button class="btn btn-save" id="btn-${item.id}">Save Changes</button>`;
+        
+        div.innerHTML = html;
+        adminList.appendChild(div);
+
+        // --- LOGIC ---
+
+        // A. "Set All" Logic
+        const batchInput = div.querySelector(`#batch-${item.id}`);
+        batchInput.addEventListener("input", (e) => {
+           const val = e.target.value;
+           if(val === "") return; // Don't do anything if empty
+           
+           // Find all inputs for this specific card and update them
+           const allInputs = div.querySelectorAll(`.individual-input-${item.id}`);
+           allInputs.forEach(input => {
+             input.value = val;
+           });
+        });
+
+        // B. Save Button Logic
+        const btn = div.querySelector(`#btn-${item.id}`);
+        btn.addEventListener("click", async () => {
+          btn.innerText = "Saving...";
+          btn.style.opacity = "0.7";
+          
+          // 1. Gather all data from the inputs
+          const newVariants = variants.map((v, idx) => {
+             const inputVal = document.getElementById(`inp-${item.id}-${idx}`).value;
+             return { color: v.color, qty: Number(inputVal) };
+          });
+
+          // 2. Send to Firebase
+          try {
+            await updateDoc(doc(db, "products", item.id), { variants: newVariants });
+            
+            // Success Animation
+            btn.innerText = "Stock Updated!";
+            btn.style.background = "#2e7d32"; // Green
+            btn.style.opacity = "1";
+            
+            setTimeout(() => {
+              btn.innerText = "Save Changes";
+              btn.style.background = "#1a1a1a"; // Back to Black
+            }, 1500);
+            
+            // Clear batch input
+            batchInput.value = ""; 
+
+          } catch (e) {
+            console.error(e);
+            alert("Error updating stock. Check internet.");
+            btn.innerText = "Retry";
+          }
+        });
+      }
+
+      // 3. Smart Color Matcher
+      function getSmartColor(name) {
+        if (!name) return "#9E9E9E";
+        const n = name.toLowerCase();
+
+        if (n.includes("decent") && n.includes("blue")) return "#2b4f81"; 
+        if (n.includes("precious") && n.includes("white")) return "#ffffff"; 
+        if (n.includes("axis") && n.includes("gray")) return "#474b4e"; 
+        if (n.includes("magnificent") || n.includes("copper")) return "#80604d";
+        if (n.includes("rebel") && n.includes("red")) return "#781016"; 
+        if (n.includes("black")) return "#050505"; 
+        if (n.includes("siren") && n.includes("blue")) return "#1c6bb5";
+        if (n.includes("marvel") && n.includes("blue")) return "#263238"; 
+        if (n.includes("steel") && n.includes("black")) return "#212121"; 
+        if (n.includes("sangria") && n.includes("red")) return "#58181f"; 
+        if (n.includes("marshal") && n.includes("green")) return "#4b5320"; 
+        if (n.includes("sports") && n.includes("red")) return "#cc0000"; 
+        if (n.includes("genny") && n.includes("grey")) return "#8d9699"; 
+
+        // Generic
+        if (n.includes("blue") && n.includes("light")) return "#64b5f6";
+        if (n.includes("blue")) return "#1565c0";
+        if (n.includes("red")) return "#d32f2f";
+        if (n.includes("white")) return "#ffffff";
+        if (n.includes("silver")) return "#e0e0e0";
+        if (n.includes("grey") || n.includes("gray")) return "#757575";
+        if (n.includes("yellow")) return "#fbc02d";
+        if (n.includes("brown")) return "#795548";
+        if (n.includes("orange")) return "#ef6c00";
+        if (n.includes("matte")) return "#555";
+
+        return "#9E9E9E"; 
+      }
     </script>
 
     <script>
-        function adminLogin() {
-            const password = prompt("Staff Password:");
-            if (password === "honda123") {
-                document.getElementById('admin-section').style.display = 'block';
-                window.scrollTo(0, document.body.scrollHeight);
-            } else if(password) {
-                alert("Wrong Password!");
-            }
+      function toggleAdmin(show) {
+        const panel = document.getElementById("admin-overlay");
+        panel.style.display = show ? "flex" : "none";
+        document.body.style.overflow = show ? "hidden" : "auto";
+      }
+
+      function adminLogin() {
+        const password = prompt("Staff Password:");
+        if (password === "kacheryhonda123") {
+          toggleAdmin(true);
+        } else if (password !== null) {
+          alert("Incorrect");
         }
-        function logout() { document.getElementById('admin-section').style.display = 'none'; }
+      }
     </script>
-</body>
+    
+    <footer class="simple-footer">
+      <p> Developed by Ijas <a href="https://www.instagram.com/ijaszs?igsh=MWFlZXBmNmduMXF6aw%3D%3D&utm_source=qr ">Contact Us</a></p>
+    </footer>
+  </body>
 </html>
