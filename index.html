@@ -4,20 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="https://hw-2ehpefpo3-hw-51b57a82.vercel.app/favicon.ico">
-    <title>KACHERY HONDA</title>
+    <title>KACHERY HONDA | Live Inventory</title>
     <style>
-      /* --- 1. CSS VARIABLES & RESET --- */
+      /* =========================================
+         1. VARIABLES & RESET
+         ========================================= */
       :root {
         --bg-color: #f0f2f5;
         --card-bg: #ffffff;
         --honda-red: #cc0000;
         --text-dark: #1a1a1a;
+        --success-green: #2e7d32;
       }
 
       * { box-sizing: border-box; }
 
       body {
-        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        font-family: "Figtree", sans-serif;
         background-color: var(--bg-color);
         margin: 0;
         padding: 0;
@@ -25,7 +28,9 @@
         color: var(--text-dark);
       }
 
-      /* --- 2. HEADER --- */
+      /* =========================================
+         2. HEADER
+         ========================================= */
       header {
         background: #fff;
         padding: 15px 20px;
@@ -42,7 +47,7 @@
       .live-indicator {
         font-size: 0.8rem;
         font-weight: 700;
-        color: #2e7d32;
+        color: var(--success-green);
         display: flex;
         align-items: center;
         gap: 6px;
@@ -54,13 +59,15 @@
       .blink {
         width: 8px;
         height: 8px;
-        background: #2e7d32;
+        background: var(--success-green);
         border-radius: 50%;
         animation: blinker 2s linear infinite;
       }
       @keyframes blinker { 50% { opacity: 0; } }
 
-      /* --- 3. MAIN LAYOUT --- */
+      /* =========================================
+         3. MAIN LAYOUT & TITLES
+         ========================================= */
       .container {
         max-width: 1400px;
         margin: 0 auto;
@@ -76,7 +83,9 @@
         border-left: 5px solid var(--honda-red);
       }
 
-      /* --- 4. SCROLLER --- */
+      /* =========================================
+         4. CARD SCROLLER (MOBILE DEFAULT)
+         ========================================= */
       .scroller-wrapper {
         display: flex;
         overflow-x: auto;
@@ -88,18 +97,21 @@
       }
       .scroller-wrapper::-webkit-scrollbar { display: none; }
 
-      /* --- 5. PRODUCT CARD DESIGN --- */
+      /* =========================================
+         5. PRODUCT CARD STYLES
+         ========================================= */
       .product-card {
         background: #fff;
         border-radius: 16px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        min-width: 290px; /* Slightly wider to fit colors */
+        min-width: 290px;
         max-width: 290px;
         scroll-snap-align: start;
         border: 1px solid #e0e0e0;
         display: flex;
         flex-direction: column;
         overflow: hidden;
+        transition: transform 0.2s ease;
       }
 
       .card-image-box {
@@ -127,13 +139,13 @@
         color: #000;
       }
 
-      /* --- COLOR GRID LAYOUT --- */
+      /* Stock Grid (Bubbles) */
       .stock-grid {
         padding: 15px;
         background: #fff;
         display: flex;
-        flex-wrap: wrap; /* Allows colors to wrap to next line */
-        gap: 12px;       /* Space between bubbles */
+        flex-wrap: wrap;
+        gap: 12px;
         justify-content: center; 
         border-top: 1px dashed #eee;
         flex-grow: 1;
@@ -153,28 +165,55 @@
         border-radius: 50%;
         border: 2px solid #fff;
         box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        position: relative;
+      }
+      
+      .swatch-white-border { border: 1px solid #ddd; }
+      .swatch-qty { font-size: 0.8rem; font-weight: 700; color: #333; }
+
+      /* =========================================
+         6. OUT OF STOCK (OOS) DESIGN
+         ========================================= */
+      .out-of-stock-container {
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 15px;
+        background: #fff;
+        background-image: linear-gradient(45deg, #f9f9f9 25%, transparent 25%, transparent 50%, #f9f9f9 50%, #f9f9f9 75%, transparent 75%, transparent);
+        background-size: 20px 20px;
       }
 
-      .swatch-out-of-stock {
-        opacity: 0.3;
-        filter: grayscale(100%);
-        border: 2px dashed #ccc;
-        box-shadow: none;
+      .oos-badge-premium {
+        background: linear-gradient(135deg, #ff4d4d, #cc0000);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 30px;
+        font-weight: 800;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 6px 15px rgba(204, 0, 0, 0.3);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 2px solid #fff;
       }
+      
+      .oos-badge-premium svg { width: 18px; height: 18px; fill: currentColor; }
 
-      .swatch-qty {
-        font-size: 0.8rem;
-        font-weight: 700;
-        color: #333;
+      /* OOS State Modifiers */
+      .product-card.is-oos .card-image-box::after {
+         content: ''; position: absolute; top:0; left:0; right:0; bottom:0;
+         background: rgba(204,0,0,0.05); pointer-events: none;
       }
+      .product-card.is-oos .card-image-box { position: relative; }
+      .product-card.is-oos .card-image-box img { filter: grayscale(100%) contrast(90%); opacity: 0.7; }
+      .product-card.is-oos .card-model-name { color: #999; }
 
-      .swatch-white-border {
-        border: 1px solid #ddd;
-      }
-
-
-      /* --- 6. ADMIN PANEL --- */
+      /* =========================================
+         7. ADMIN PANEL
+         ========================================= */
       #admin-overlay {
         display: none;
         position: fixed;
@@ -208,67 +247,48 @@
       }
 
       .admin-content { overflow-y: auto; flex-grow: 1; }
-
-      .admin-card-row {
-        background: #f8f9fa;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 10px;
-        margin-bottom: 15px;
-      }
-
-      .admin-color-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 8px 0;
-        border-bottom: 1px solid #eee;
-      }
+      .admin-card-row { background: #f8f9fa; border: 1px solid #ddd; border-radius: 8px; padding: 10px; margin-bottom: 15px; }
+      .admin-color-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; }
       .admin-color-row:last-child { border-bottom: none; }
-
-      .admin-input {
-        width: 60px;
-        padding: 8px;
-        text-align: center;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        font-weight: bold;
-        margin-right: 8px;
-      }
-
+      .admin-input { width: 60px; padding: 8px; text-align: center; border: 1px solid #ccc; border-radius: 6px; font-weight: bold; margin-right: 8px; }
+      
       .btn { border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
       .btn-save { background: #000; color: #fff; width: 100%; margin-top:10px;}
       .btn-close { background: #f0f0f0; color: #333; }
       
       .login-trigger {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: #111;
-        color: white;
-        padding: 12px 20px;
-        border-radius: 30px;
+        position: fixed; bottom: 20px; right: 20px;
+        background: #111; color: white;
+        padding: 12px 20px; border-radius: 30px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        border: none;
-        font-weight: bold;
-        cursor: pointer;
-        z-index: 1500;
+        border: none; font-weight: bold; cursor: pointer; z-index: 1500;
       }
 
-     /* Footer Base */
-    .simple-footer {
-      background-color: #f1f1f1; 
-      padding: 20px;            
-      text-align: center;        
-      width: 100%;               
-      margin-top: 50px;          
-    }
+      .mini-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-right: 5px; border: 1px solid #ddd; }
 
-    .simple-footer a {
-      color: #333;
-      text-decoration: none;
-      font-weight: bold;
-    }
+      .simple-footer { background-color: #f1f1f1; padding: 20px; text-align: center; width: 100%; margin-top: 50px; }
+      .simple-footer a { color: #333; text-decoration: none; font-weight: bold; }
+
+      /* =========================================
+         8. DESKTOP / LARGE DISPLAY STYLES
+         ========================================= */
+      @media (min-width: 1024px) {
+        .scroller-wrapper {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+          gap: 25px;
+          overflow-x: visible;
+          padding-bottom: 0;
+          scroll-snap-type: none;
+        }
+
+        .product-card { min-width: auto; max-width: 100%; width: 100%; }
+        .card-image-box { height: 190px; }
+        
+        body::-webkit-scrollbar { width: 10px; }
+        body::-webkit-scrollbar-track { background: #f1f1f1; }
+        body::-webkit-scrollbar-thumb { background: #cc0000; border-radius: 5px; }
+      }
     </style>
   </head>
   <body>
@@ -282,10 +302,8 @@
               <path d="M21.6512 6.56494C21.6512 2.90755 24.6031 0.341797 31.1922 0.341797C37.7812 0.341797 40.6949 2.90755 40.6949 6.56494C40.6949 10.2223 37.7402 12.859 31.1922 12.859C24.6442 12.859 21.6512 10.3182 21.6512 6.56494ZM31.1696 2.58729C28.5177 2.58729 27.0085 3.57341 27.0085 6.59121C27.0085 9.609 28.5177 10.6435 31.1696 10.6435C33.8215 10.6435 35.3362 9.65831 35.3362 6.59121C35.3362 3.5241 33.8238 2.58729 31.1696 2.58729Z" fill="#CC0000"></path>
               <path d="M41.2114 12.4482H48.6718V10.8939L47.0687 10.7128C46.6134 10.6644 46.3355 10.2801 46.3355 9.75017V3.82194L52.5389 11.9924C52.7467 12.2634 53.1333 12.4482 53.5019 12.4482H59.3555V3.61596C59.3555 3.19939 59.4629 2.63491 60.0642 2.56394L61.6904 2.38054V0.794922H54.2309V2.35935L55.8599 2.56441C56.4308 2.63353 56.5677 3.11322 56.5677 3.65973V9.42991L50.409 1.30549C50.1818 1.00827 49.8851 0.794922 49.4501 0.794922H41.2109V2.38101L42.7671 2.56441C43.315 2.64597 43.5214 2.92383 43.5214 3.68323V9.59073C43.5214 10.2893 43.3306 10.6234 42.7431 10.7128L41.2109 10.8939V12.4482" fill="#CC0000"></path>
             </g>
-            <defs>
-              <clipPath id="clip0_5439_24857"><rect width="261.073" height="24" fill="white"></rect></clipPath>
-            </defs>
-          </svg>
+            <defs><clipPath id="clip0_5439_24857"><rect width="261.073" height="24" fill="white"></rect></clipPath></defs>
+         </svg>
       </div>
       <div class="live-indicator">
         <span class="blink"></span> Live
@@ -293,7 +311,6 @@
     </header>
 
     <div class="container">
-      
       <div class="section-title">Scooters</div>
       <div class="scroller-wrapper" id="scooter-list">
         <div style="padding:20px; color:#999;">Loading Inventory...</div>
@@ -303,7 +320,6 @@
       <div class="scroller-wrapper" id="bike-list">
         <div style="padding:20px; color:#999;">Loading Inventory...</div>
       </div>
-
     </div>
 
     <div id="admin-overlay">
@@ -318,16 +334,14 @@
 
     <button class="login-trigger" onclick="adminLogin()">Staff 🔒</button>
 
+    <footer class="simple-footer">
+      <p>Developed by Ijas</p>
+    </footer>
+
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
       import {
-        getFirestore,
-        collection,
-        onSnapshot,
-        doc,
-        updateDoc,
-        query,
-        orderBy
+        getFirestore, collection, onSnapshot, doc, updateDoc, query, orderBy
       } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
       // 1. FIREBASE CONFIG
@@ -380,69 +394,81 @@
 
       // --- HELPER FUNCTIONS ---
 
-      // 1. Create Display Card with Multi-Color Grid
+      // 1. Create Display Card (Stock Check + New OOS Design + Patterns)
       function createCard(item) {
         const imgSrc = item.img || "https://placehold.co/400x300?text=Honda";
-        
-        let variantsHTML = "";
-        // Safely check if variants exists and is an array
         const variants = Array.isArray(item.variants) ? item.variants : [];
 
-        variants.forEach(v => {
-          const hex = getSmartColor(v.color);
-          const isWhite = v.color.toLowerCase().includes("white") || v.color.toLowerCase().includes("silver");
-          const borderClass = isWhite ? "swatch-white-border" : "";
-          const stockClass = v.qty == 0 ? "swatch-out-of-stock" : "";
-          
-          variantsHTML += `
-            <div class="color-swatch-wrapper" title="${v.color}">
-              <div class="color-swatch ${borderClass} ${stockClass}" 
-                   style="background-color: ${hex};">
+        // Calculate Total Stock
+        const totalQty = variants.reduce((sum, v) => sum + (Number(v.qty) || 0), 0);
+
+        let bottomContent = "";
+        let cardClass = "product-card";
+
+        if (totalQty === 0) {
+          // A. IF STOCK IS 0: Show Premium Badge with Icon
+          cardClass += " is-oos"; 
+          bottomContent = `
+            <div class="out-of-stock-container">
+              <div class="oos-badge-premium">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8 0-1.85.63-3.55 1.69-4.9L16.9 18.31C15.55 19.37 13.85 20 12 20zm6.31-3.1L7.1 5.69C8.45 4.63 10.15 4 12 4c4.42 0 8 3.58 8 8 0 1.85-.63 3.55-1.69 4.9z"/></svg>
+                <span>Sold Out</span>
               </div>
-              <span class="swatch-qty">${v.qty}</span>
             </div>
           `;
-        });
+        } else {
+          // B. IF STOCK EXISTS: Show Bubbles
+          let variantsHTML = "";
+          variants.forEach(v => {
+            const backgroundStyle = getPaintPattern(v.color);
+            const isWhite = v.color.toLowerCase().includes("white") || v.color.toLowerCase().includes("silver");
+            const borderClass = isWhite ? "swatch-white-border" : "";
+
+            variantsHTML += `
+              <div class="color-swatch-wrapper" title="${v.color}">
+                <div class="color-swatch ${borderClass}" style="background: ${backgroundStyle};"></div>
+                <span class="swatch-qty">${v.qty}</span>
+              </div>
+            `;
+          });
+          
+          bottomContent = `<div class="stock-grid">${variantsHTML}</div>`;
+        }
 
         return `
-          <div class="product-card">
+          <div class="${cardClass}">
             <div class="card-image-box">
               <img src="${imgSrc}" alt="${item.model}" loading="lazy">
             </div>
             <h3 class="card-model-name">${item.model}</h3>
-            <div class="stock-grid">
-              ${variantsHTML}
-            </div>
+            ${bottomContent}
           </div>
         `;
       }
 
-      // 2. Create Admin Control Block (One Block per Model)
-     // 2. Create Admin Control Block (One Block per Model)
+      // 2. Create Admin Control Block
       function createAdminBlock(item) {
         const div = document.createElement("div");
         div.className = "admin-card-row";
         
         const variants = Array.isArray(item.variants) ? item.variants : [];
         
-        // HTML Structure
         let html = `
           <div class="admin-card-title">
-            <span>${item.model}</span>
-            <div class="batch-control">
-               Set All: <input type="number" class="batch-input" id="batch-${item.id}" placeholder="#">
+            <span style="font-weight:bold; font-size:1.1rem;">${item.model}</span>
+            <div class="batch-control" style="margin-top:5px; font-size:0.9rem;">
+               Set All: <input type="number" class="batch-input" id="batch-${item.id}" placeholder="#" style="width:50px; padding:4px;">
             </div>
           </div>
-          <div id="inputs-container-${item.id}">
+          <div id="inputs-container-${item.id}" style="margin-top:10px;">
         `;
 
-        // Loop through colors to create individual inputs
         variants.forEach((v, index) => {
-           const colorHex = getSmartColor(v.color);
+           const backgroundStyle = getPaintPattern(v.color);
            html += `
              <div class="admin-color-row">
                 <div class="admin-color-label">
-                  <span class="mini-dot" style="background:${colorHex}"></span>
+                  <span class="mini-dot" style="background:${backgroundStyle}"></span>
                   ${v.color}
                 </div>
                 <input type="number" class="admin-input individual-input-${item.id}" id="inp-${item.id}-${index}" value="${v.qty}" min="0">
@@ -451,54 +477,38 @@
         });
 
         html += `</div><button class="btn btn-save" id="btn-${item.id}">Save Changes</button>`;
-        
         div.innerHTML = html;
         adminList.appendChild(div);
 
-        // --- LOGIC ---
-
-        // A. "Set All" Logic
+        // Logic (Batch & Save)
         const batchInput = div.querySelector(`#batch-${item.id}`);
         batchInput.addEventListener("input", (e) => {
            const val = e.target.value;
-           if(val === "") return; // Don't do anything if empty
-           
-           // Find all inputs for this specific card and update them
+           if(val === "") return;
            const allInputs = div.querySelectorAll(`.individual-input-${item.id}`);
-           allInputs.forEach(input => {
-             input.value = val;
-           });
+           allInputs.forEach(input => { input.value = val; });
         });
 
-        // B. Save Button Logic
         const btn = div.querySelector(`#btn-${item.id}`);
         btn.addEventListener("click", async () => {
           btn.innerText = "Saving...";
           btn.style.opacity = "0.7";
           
-          // 1. Gather all data from the inputs
           const newVariants = variants.map((v, idx) => {
              const inputVal = document.getElementById(`inp-${item.id}-${idx}`).value;
              return { color: v.color, qty: Number(inputVal) };
           });
 
-          // 2. Send to Firebase
           try {
             await updateDoc(doc(db, "products", item.id), { variants: newVariants });
-            
-            // Success Animation
             btn.innerText = "Stock Updated!";
-            btn.style.background = "#2e7d32"; // Green
+            btn.style.background = "#2e7d32"; 
             btn.style.opacity = "1";
-            
             setTimeout(() => {
               btn.innerText = "Save Changes";
-              btn.style.background = "#1a1a1a"; // Back to Black
+              btn.style.background = "#1a1a1a";
             }, 1500);
-            
-            // Clear batch input
             batchInput.value = ""; 
-
           } catch (e) {
             console.error(e);
             alert("Error updating stock. Check internet.");
@@ -507,24 +517,55 @@
         });
       }
 
-      // 3. Smart Color Matcher
-      function getSmartColor(name) {
+      // 3. COLOR LOGIC (Patterns & Gradients)
+      function getPaintPattern(name) {
         if (!name) return "#9E9E9E";
         const n = name.toLowerCase();
 
+        // A. Specifics
+        if (n.includes("siren") && n.includes("green") && n.includes("stripes")) {
+           return "linear-gradient(135deg, #1c6bb5 60%, #4b5320 60%, #4b5320 75%, #8d9699 75%)";
+        }
+        if (n.includes("sports") && n.includes("red") && n.includes("black")) {
+           return "linear-gradient(135deg, #cc0000 50%, #000000 50%)";
+        }
+        if (n.includes("repsol")) {
+           return "linear-gradient(90deg, #ff6600 33%, #ffffff 33%, #ffffff 66%, #cc0000 66%)";
+        }
+
+        // B. Generics
+        if (n.includes("+") || n.includes("&") || n.includes("dual")) {
+             const c1 = getBaseHex(n.split(/[+&]/)[0]); 
+             const c2 = getBaseHex(n.split(/[+&]/)[1]);
+             return `linear-gradient(135deg, ${c1} 50%, ${c2} 50%)`;
+        }
+        if (n.includes("stripe")) {
+            const base = getBaseHex(n);
+            const stripe = base === "#ffffff" ? "#000000" : "#ffffff";
+            return `linear-gradient(110deg, ${base} 80%, ${stripe} 80%)`;
+        }
+
+        // C. Default
+        return getBaseHex(n);
+      }
+
+      // 4. Base Colors
+      function getBaseHex(name) {
+        if(!name) return "#999";
+        const n = name.toLowerCase();
+
+        // Honda Specific
         if (n.includes("decent") && n.includes("blue")) return "#2b4f81"; 
         if (n.includes("precious") && n.includes("white")) return "#ffffff"; 
         if (n.includes("axis") && n.includes("gray")) return "#474b4e"; 
         if (n.includes("magnificent") || n.includes("copper")) return "#80604d";
         if (n.includes("rebel") && n.includes("red")) return "#781016"; 
-        if (n.includes("black")) return "#050505"; 
+        if (n.includes("matte") && n.includes("marvel")) return "#263238"; 
         if (n.includes("siren") && n.includes("blue")) return "#1c6bb5";
-        if (n.includes("marvel") && n.includes("blue")) return "#263238"; 
-        if (n.includes("steel") && n.includes("black")) return "#212121"; 
-        if (n.includes("sangria") && n.includes("red")) return "#58181f"; 
-        if (n.includes("marshal") && n.includes("green")) return "#4b5320"; 
-        if (n.includes("sports") && n.includes("red")) return "#cc0000"; 
-        if (n.includes("genny") && n.includes("grey")) return "#8d9699"; 
+        if (n.includes("sangria")) return "#58181f"; 
+        if (n.includes("marshal")) return "#4b5320"; 
+        if (n.includes("genny")) return "#8d9699"; 
+        if (n.includes("ross") && n.includes("white")) return "#f2f2f2";
 
         // Generic
         if (n.includes("blue") && n.includes("light")) return "#64b5f6";
@@ -533,10 +574,11 @@
         if (n.includes("white")) return "#ffffff";
         if (n.includes("silver")) return "#e0e0e0";
         if (n.includes("grey") || n.includes("gray")) return "#757575";
-        if (n.includes("yellow")) return "#fbc02d";
+        if (n.includes("yellow")) return "#fdd835";
         if (n.includes("brown")) return "#795548";
         if (n.includes("orange")) return "#ef6c00";
-        if (n.includes("matte")) return "#555";
+        if (n.includes("black")) return "#111111";
+        if (n.includes("matte")) return "#555555";
 
         return "#9E9E9E"; 
       }
@@ -558,9 +600,5 @@
         }
       }
     </script>
-    
-    <footer class="simple-footer">
-      <p> Developed by Ijas <a href="https://www.instagram.com/ijaszs?igsh=MWFlZXBmNmduMXF6aw%3D%3D&utm_source=qr ">Contact Us</a></p>
-    </footer>
   </body>
 </html>
